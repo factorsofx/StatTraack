@@ -1,5 +1,6 @@
 package com.factorsofx.stattrack.persist;
 
+import com.factorsofx.stattrack.security.UserProfile;
 import com.factorsofx.stattrack.stat.MessageStat;
 import com.factorsofx.stattrack.stat.OptedInUser;
 import net.dv8tion.jda.core.entities.*;
@@ -24,6 +25,10 @@ public interface PersistenceService
     List<MessageStat> getUserStats(User user, Guild guild);
 
     Set<OptedInUser> getOptedInUsers();
+
+    OptedInUser findOptedInUserWithHashedId(String hashedId);
+
+    UserProfile getUserProfile(User user, Guild guild);
 
     MessageStat getLatestMessage();
 

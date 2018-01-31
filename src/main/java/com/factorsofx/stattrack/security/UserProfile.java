@@ -1,15 +1,21 @@
 package com.factorsofx.stattrack.security;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class UserProfile
 {
     private long userId;
-    private Permission[] perms;
+    private long guildId;
+    private List<Permission> perms;
 
-    public UserProfile(long userId, Permission[] perms)
+    public UserProfile() {} // God DAMN it BSON
+
+    public UserProfile(long userId, long guildId, List<Permission> perms)
     {
         this.userId = userId;
+        this.guildId = guildId;
         this.perms = perms;
     }
 
@@ -18,8 +24,13 @@ public class UserProfile
         return userId;
     }
 
-    public Permission[] getPerms()
+    public long getGuildId()
     {
-        return Arrays.copyOf(perms, perms.length);
+        return guildId;
+    }
+
+    public List<Permission> getPerms()
+    {
+        return Collections.unmodifiableList(perms);
     }
 }

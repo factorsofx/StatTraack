@@ -1,12 +1,10 @@
 package com.factorsofx.stattrack.security;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
-
 public enum Permission
 {
     VISUALS,
-    QUERY,
-    ADMINISTRATE;
+    ADMINISTRATE,
+    BANNED; // Not really a permission but it works?
+
+    public static final Permission[] DEFAULT_PERMS = new Permission[]{VISUALS};
 }

@@ -1,11 +1,13 @@
 package com.factorsofx.stattrack.command.admin;
 
 import com.factorsofx.stattrack.command.BotCommand;
+import com.factorsofx.stattrack.command.RegisterCommand;
 import com.factorsofx.stattrack.persist.PersistenceService;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
+@RegisterCommand(value = "stats", optExclusive = false)
 public class StatisticsCommand implements BotCommand
 {
     private PersistenceService persistenceService;

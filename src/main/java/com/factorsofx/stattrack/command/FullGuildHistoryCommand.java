@@ -1,6 +1,8 @@
 package com.factorsofx.stattrack.command;
 
 import com.factorsofx.stattrack.persist.PersistenceService;
+import com.factorsofx.stattrack.security.Permission;
+import com.factorsofx.stattrack.stat.DatasetUtils;
 import com.factorsofx.stattrack.stat.MessageStat;
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
@@ -23,6 +25,7 @@ import java.io.UncheckedIOException;
 import java.time.OffsetDateTime;
 import java.util.*;
 
+@RegisterCommand(value = "fullhistory", permissions = Permission.VISUALS)
 public class FullGuildHistoryCommand implements BotCommand
 {
     private PersistenceService persistenceService;

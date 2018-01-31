@@ -1,6 +1,7 @@
 package com.factorsofx.stattrack.command;
 
 import com.factorsofx.stattrack.persist.PersistenceService;
+import com.factorsofx.stattrack.security.Permission;
 import com.factorsofx.stattrack.stat.MessageStat;
 import com.factorsofx.stattrack.stat.OptedInUser;
 import gnu.trove.map.TLongIntMap;
@@ -26,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+@RegisterCommand(value = "userstats", permissions = Permission.VISUALS)
 public class UserStatsCommand implements BotCommand
 {
     private PersistenceService persistenceService;

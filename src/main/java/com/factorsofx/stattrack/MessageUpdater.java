@@ -42,9 +42,11 @@ class MessageUpdater
         MessageStat lastStat = persistenceService.getLatestMessage();
         OffsetDateTime last = lastStat != null ? lastStat.getTime() : OffsetDateTime.of(2015, 3, 1, 0, 0, 0, 0, ZoneOffset.UTC);
 
+        int total = 0;
+
         for(TextChannel channel : jda.getTextChannels())
         {
-            log.info("Starting back-traversal of channel {}:{} to {}.", channel.getGuild().getName(), channel.getName(), last);
+            log.info("Starting readthrough of channel {}:{} to {}.", channel.getGuild().getName(), channel.getName(), last);
             try
             {
                 MessageHistory traversal = channel.getHistory();
@@ -53,6 +55,7 @@ class MessageUpdater
                 while(!messages.isEmpty())
                 {
                     persistenceService.persistMessages(messages);
+                    total += messages.size();
                     messages = traversal.retrievePast(100).complete();
                     messages = messages.stream().filter((msg) -> msg.getCreationTime().isBefore(startupTime)).filter((msg) -> msg.getCreationTime().isAfter(last)).collect(Collectors.toList());
                 }
@@ -63,9 +66,10 @@ class MessageUpdater
             }
             catch(MongoBulkWriteException e)
             {
-                log.error("Bulk write error saving messages from back-traversal", e);
+                log.error("Bulk write error saving messages from readthrough", e);
             }
         }
+        log.info("Completed channel readthrough, found " + total + " new messages.");
         jda.getPresence().setStatus(OnlineStatus.ONLINE);
     }
 }

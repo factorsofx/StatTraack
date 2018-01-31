@@ -5,6 +5,7 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
+@RegisterCommand(value = "optout", optExclusive = false)
 public class OptOut implements BotCommand
 {
     private PersistenceService persistenceService;
@@ -24,7 +25,7 @@ public class OptOut implements BotCommand
         }
         else
         {
-            channel.sendMessage(user.getAsMention() + ", you were already opting out.").complete();
+            channel.sendMessage(user.getAsMention() + ", you were already opted out.").complete();
         }
     }
 }

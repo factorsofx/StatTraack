@@ -12,4 +12,6 @@ public @interface RegisterCommand
     String[] value();
 
     Permission[] permissions() default {};
+
+    boolean optExclusive() default true;
 }

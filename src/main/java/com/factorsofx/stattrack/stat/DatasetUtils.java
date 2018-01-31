@@ -1,4 +1,4 @@
-package com.factorsofx.stattrack.command;
+package com.factorsofx.stattrack.stat;
 
 import com.factorsofx.stattrack.stat.MessageStat;
 import net.dv8tion.jda.core.entities.TextChannel;

@@ -1,8 +1,9 @@
 package com.factorsofx.stattrack.command;
 
 import com.factorsofx.stattrack.persist.PersistenceService;
+import com.factorsofx.stattrack.security.Permission;
+import com.factorsofx.stattrack.stat.DatasetUtils;
 import com.factorsofx.stattrack.stat.MessageStat;
-import net.dv8tion.jda.core.entities.Channel;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -23,9 +24,9 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+@RegisterCommand(value = "userhistory", permissions = Permission.VISUALS)
 public class UserHistoryCommand implements BotCommand
 {
     private PersistenceService persistenceService;
@@ -36,8 +37,8 @@ public class UserHistoryCommand implements BotCommand
         this.persistenceService = persistenceService;
 
         chartTheme = new StandardChartTheme("std", false);
-        chartTheme.setBarPainter(new StandardBarPainter());
-        chartTheme.setXYBarPainter(new StandardXYBarPainter());
+        //chartTheme.setBarPainter(new StandardBarPainter());
+        //chartTheme.setXYBarPainter(new StandardXYBarPainter());
     }
 
     @Override
@@ -48,7 +49,7 @@ public class UserHistoryCommand implements BotCommand
         {
             if(args.length == 0)
             {
-                channel.sendMessage("Generating one-week histogram chart for you...").complete();
+                channel.sendMessage("Generating one-week message history for you...").complete();
                 targetChannels.add(user);
             }
             else
@@ -57,13 +58,13 @@ public class UserHistoryCommand implements BotCommand
                 {
                     targetChannels.addAll(message.getJDA().getUsersByName(uname, true));
                 }
-                channel.sendMessage("Generating one-week histogram chart for given users...").complete();
+                channel.sendMessage("Generating one-week message history for given users...").complete();
             }
         }
         else
         {
             targetChannels.addAll(message.getMentionedUsers());
-            channel.sendMessage("Generating one-week histogram chart for given users...").complete();
+            channel.sendMessage("Generating one-week message history for given users...").complete();
         }
 
         DefaultTableXYDataset dataset = new DefaultTableXYDataset();
@@ -74,14 +75,15 @@ public class UserHistoryCommand implements BotCommand
         for(User person : targetChannels)
         {
             XYSeries series = new XYSeries(person.getName(), true, false);
-            List<MessageStat> stats = persistenceService.getUserStats(person, message.getGuild());
-            DatasetUtils.makeHistogramPlot(stats, series, first, last, 168);
+            List<MessageStat> stats = persistenceService.getTimeLimitedUserStats(person, message.getGuild(), first, last);
+            //DatasetUtils.makeHistogramPlot(stats, series, first, last, 42);
+            DatasetUtils.makeAccumPlot(stats, series, first, last, 42);
             dataset.addSeries(series);
         }
-        XYPlot plot = new XYPlot(dataset, new DateAxis("Message Time"), new NumberAxis("Messages"), new XYBarRenderer());
+        XYPlot plot = new XYPlot(dataset, new DateAxis("Message Time"), new NumberAxis("Messages"), new StackedXYAreaRenderer2());
         plot.setOrientation(PlotOrientation.VERTICAL);
 
-        plot.setRenderer(new XYLineAndShapeRenderer());
+        plot.setRenderer(new StackedXYAreaRenderer2());
         // plot.setRenderer(new XYArea);
 
         JFreeChart chart = new JFreeChart("User Activity", plot);

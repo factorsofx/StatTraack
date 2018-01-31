@@ -1,5 +1,7 @@
 package com.factorsofx.stattrack.persist;
 
+import com.factorsofx.stattrack.security.Permission;
+import com.factorsofx.stattrack.security.UserProfile;
 import com.factorsofx.stattrack.stat.MessageStat;
 import com.factorsofx.stattrack.stat.OptedInUser;
 import com.google.common.primitives.Longs;
@@ -20,6 +22,7 @@ import org.bson.codecs.pojo.Convention;
 import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
+import org.bson.types.Code;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -32,19 +35,21 @@ public class MongoPersistenceService implements PersistenceService
 {
     private MongoCollection<MessageStat> statCollection;
     private MongoCollection<OptedInUser> userCollection;
+    private MongoCollection<UserProfile> profileCollection;
 
     public MongoPersistenceService(String host, int port, String dbName)
     {
         List<Convention> conventions = new ArrayList<>(Conventions.DEFAULT_CONVENTIONS);
         conventions.add(0, Conventions.SET_PRIVATE_FIELDS_CONVENTION);
 
-        CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(), CodecRegistries.fromProviders(new OffsetDateTimeCodecProvider(), PojoCodecProvider.builder().conventions(conventions).automatic(true).build()));
+        CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(), CodecRegistries.fromCodecs(new OffsetDateTimeCodecProvider.OffsetDateTimeCodec<>()), CodecRegistries.fromProviders(new EnumCodecProvider(), PojoCodecProvider.builder().conventions(conventions).automatic(true).build()));
 
         MongoClient client = new MongoClient(new ServerAddress(host, port), MongoClientOptions.builder().codecRegistry(pojoCodecRegistry).build());
         MongoDatabase database = client.getDatabase(dbName);
 
-        statCollection = database.getCollection("msgStats", MessageStat.class);
-        userCollection = database.getCollection("users", OptedInUser.class);
+        statCollection    = database.getCollection("msgStats", MessageStat.class);
+        userCollection    = database.getCollection("users", OptedInUser.class);
+        profileCollection = database.getCollection("profiles", UserProfile.class);
     }
 
     @Override
@@ -106,6 +111,24 @@ public class MongoPersistenceService implements PersistenceService
         THashSet<OptedInUser> found = new THashSet<>();
         userCollection.find().into(found);
         return found;
+    }
+
+    @Override
+    public OptedInUser findOptedInUserWithHashedId(String hashedId)
+    {
+        return userCollection.find(eq("hashedId", hashedId)).first();
+    }
+
+    @Override
+    public UserProfile getUserProfile(User user, Guild guild)
+    {
+        return Optional.ofNullable(profileCollection.find(and(eq("userId", user.getIdLong()), eq("guildId", guild.getIdLong()))).first())
+                .orElseGet(() ->
+                {
+                    UserProfile profile = new UserProfile(user.getIdLong(), guild.getIdLong(), Arrays.asList(Permission.DEFAULT_PERMS));
+                    profileCollection.insertOne(profile);
+                    return profile;
+                });
     }
 
     private boolean isUserOptedIn(User user)

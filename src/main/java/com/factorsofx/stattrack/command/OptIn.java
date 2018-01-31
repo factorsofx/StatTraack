@@ -5,6 +5,7 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
+@RegisterCommand(value = "optin", optExclusive = false)
 public class OptIn implements BotCommand
 {
     private PersistenceService persistenceService;
