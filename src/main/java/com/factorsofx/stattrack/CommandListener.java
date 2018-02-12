@@ -118,7 +118,7 @@ public class CommandListener
                 }
                 catch(Exception e)
                 {
-                    event.getTextChannel().sendMessage("Fuck! " + e).complete();
+                    event.getTextChannel().sendMessage(MessageUtils.getExceptionEmbed(e)).complete();
                     e.printStackTrace();
                 }
             }

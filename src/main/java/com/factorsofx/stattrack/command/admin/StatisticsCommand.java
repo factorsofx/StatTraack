@@ -3,9 +3,13 @@ package com.factorsofx.stattrack.command.admin;
 import com.factorsofx.stattrack.command.BotCommand;
 import com.factorsofx.stattrack.command.RegisterCommand;
 import com.factorsofx.stattrack.persist.PersistenceService;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
+
+import java.awt.*;
+import java.time.Instant;
 
 @RegisterCommand(value = "stats", optExclusive = false)
 public class StatisticsCommand implements BotCommand
@@ -20,11 +24,15 @@ public class StatisticsCommand implements BotCommand
     @Override
     public void execute(User user, TextChannel channel, Message message, String[] args)
     {
-        String msgBuilder = "Database statistics:```\n" +
-                " - Messages persisted: " + persistenceService.messagesStored() + '\n' +
-                " - Users opted in: " + persistenceService.usersStored() +
-                "```";
+        EmbedBuilder builder = new EmbedBuilder();
 
-        channel.sendMessage(msgBuilder).complete();
+        builder.setTitle("Database Statistics");
+        builder.setTimestamp(Instant.now());
+        builder.setColor(new Color(36, 113, 163));
+
+        builder.addField("Messages", Long.toString(persistenceService.messagesStored()), true);
+        builder.addField("Opted-in Users", Integer.toString(persistenceService.getOptedInUsers().size()), true);
+
+        channel.sendMessage(builder.build()).complete();
     }
 }

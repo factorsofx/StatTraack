@@ -1,5 +1,6 @@
 package com.factorsofx.stattrack.persist;
 
+import com.factorsofx.stattrack.penalty.Penalty;
 import com.factorsofx.stattrack.security.Permission;
 import com.factorsofx.stattrack.security.UserProfile;
 import com.factorsofx.stattrack.stat.MessageStat;
@@ -36,6 +37,7 @@ public class MongoPersistenceService implements PersistenceService
     private MongoCollection<MessageStat> statCollection;
     private MongoCollection<OptedInUser> userCollection;
     private MongoCollection<UserProfile> profileCollection;
+    private MongoCollection<Penalty>     penaltyCollection;
 
     public MongoPersistenceService(String host, int port, String dbName)
     {
@@ -50,6 +52,7 @@ public class MongoPersistenceService implements PersistenceService
         statCollection    = database.getCollection("msgStats", MessageStat.class);
         userCollection    = database.getCollection("users", OptedInUser.class);
         profileCollection = database.getCollection("profiles", UserProfile.class);
+        penaltyCollection = database.getCollection("penalties", Penalty.class);
     }
 
     @Override
@@ -140,6 +143,19 @@ public class MongoPersistenceService implements PersistenceService
     public MessageStat getLatestMessage()
     {
         return statCollection.find().sort(Sorts.descending("time")).first();
+    }
+
+    @Override
+    public List<Penalty> getUserPenalties(User user)
+    {
+        List<Penalty> penalties = new ArrayList<>();
+        return penaltyCollection.find(eq("sufferer", user.getIdLong())).into(penalties);
+    }
+
+    @Override
+    public void persistPenalty(Penalty penalty)
+    {
+        penaltyCollection.insertOne(penalty);
     }
 
     private <T, K> List<MessageStat> getMessageSetFromAnyMatch(String field, Collection<T> matches, Function<T, K> toKeyFunc)

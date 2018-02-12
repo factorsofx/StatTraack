@@ -13,10 +13,13 @@ import java.util.Optional;
 
 public class StatTrack
 {
+    public static String CMD_PREFIX;
+
     public static void main(String... args) throws LoginException, InterruptedException
     {
         final String BOT_TOKEN  = Optional.ofNullable(System.getenv("BOT_TOKEN")).orElseThrow(() -> new IllegalArgumentException("Must have bot token"));
         final String CMD_PREFIX = Optional.ofNullable(System.getenv("CMD_PREFIX")).orElse("::");
+        StatTrack.CMD_PREFIX = CMD_PREFIX;
 
         final String MONGO_HOST = Optional.ofNullable(System.getenv("MONGO_HOST")).orElse("localhost");
         final String MONGO_PORT = Optional.ofNullable(System.getenv("MONGO_PORT")).orElse("27017");
@@ -29,9 +32,11 @@ public class StatTrack
                 .setEventManager(new AnnotatedEventManager())
                 .buildBlocking();
         OffsetDateTime startTime = OffsetDateTime.now();
-        new MessageUpdater(persistenceService, jda, startTime).update();
+
         jda.addEventListener(new StatTrackListener(persistenceService, startTime));
         jda.addEventListener(new CommandListener(persistenceService, CMD_PREFIX));
         jda.addEventListener(new ConnectionStatusListener(persistenceService));
+
+        new MessageUpdater(persistenceService, jda, startTime).update();
     }
 }

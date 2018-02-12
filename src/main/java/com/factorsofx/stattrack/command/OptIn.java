@@ -1,5 +1,6 @@
 package com.factorsofx.stattrack.command;
 
+import com.factorsofx.stattrack.MessageUtils;
 import com.factorsofx.stattrack.persist.PersistenceService;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -20,8 +21,11 @@ public class OptIn implements BotCommand
     {
         if(persistenceService.getOptedInUsers().stream().noneMatch((optedInUser) -> optedInUser.getId() == user.getIdLong()))
         {
-            persistenceService.optInUser(user);
-            channel.sendMessage(user.getAsMention() + ", you are now opted in!").complete();
+            MessageUtils.doIfConfirmed("Are you sure you wish to opt into tracking?", channel, user, () ->
+            {
+                persistenceService.optInUser(user);
+                channel.sendMessage(user.getAsMention() + ", you are now opted in!").complete();
+            });
         }
         else
         {

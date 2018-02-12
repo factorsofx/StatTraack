@@ -1,5 +1,6 @@
 package com.factorsofx.stattrack.persist;
 
+import com.factorsofx.stattrack.penalty.Penalty;
 import com.factorsofx.stattrack.security.UserProfile;
 import com.factorsofx.stattrack.stat.MessageStat;
 import com.factorsofx.stattrack.stat.OptedInUser;
@@ -31,6 +32,10 @@ public interface PersistenceService
     UserProfile getUserProfile(User user, Guild guild);
 
     MessageStat getLatestMessage();
+
+    List<Penalty> getUserPenalties(User user);
+
+    void persistPenalty(Penalty penalty);
 
     void persistMessage(Message message);
 
