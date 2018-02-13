@@ -6,6 +6,7 @@ public enum Permission
     ADMINISTRATE,
     EXEC,
     PENALIZE,
+    MODPERMS,
     BANNED; // Not really a permission but it works?
 
     public static final Permission[] DEFAULT_PERMS = new Permission[]{VISUALS};

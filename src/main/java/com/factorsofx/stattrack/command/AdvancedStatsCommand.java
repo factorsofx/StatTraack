@@ -3,8 +3,6 @@ package com.factorsofx.stattrack.command;
 import com.factorsofx.stattrack.MessageUtils;
 import com.factorsofx.stattrack.StatTrack;
 import com.factorsofx.stattrack.stat.AdvStatReq;
-import com.joestelmach.natty.DateGroup;
-import com.joestelmach.natty.Parser;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import net.dv8tion.jda.core.entities.Message;
@@ -12,16 +10,10 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.output.StringBuilderWriter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.io.PrintWriter;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RegisterCommand(value = {"astats", "advancedstats"})
 public class AdvancedStatsCommand implements BotCommand

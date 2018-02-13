@@ -2,7 +2,9 @@ package com.factorsofx.stattrack.command.admin;
 
 import com.factorsofx.stattrack.command.BotCommand;
 import com.factorsofx.stattrack.command.RegisterCommand;
-import com.factorsofx.stattrack.persist.PersistenceService;
+import com.factorsofx.stattrack.persist.MessageStatStore;
+import com.factorsofx.stattrack.persist.PenaltyStore;
+import com.factorsofx.stattrack.persist.UserProfileStore;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -14,11 +16,15 @@ import java.time.Instant;
 @RegisterCommand(value = "stats", optExclusive = false)
 public class StatisticsCommand implements BotCommand
 {
-    private PersistenceService persistenceService;
+    private MessageStatStore messageStatStore;
+    private PenaltyStore penaltyStore;
+    private UserProfileStore userProfileStore;
 
-    public StatisticsCommand(PersistenceService persistenceService)
+    public StatisticsCommand(MessageStatStore messageStatStore, PenaltyStore penaltyStore, UserProfileStore userProfileStore)
     {
-        this.persistenceService = persistenceService;
+        this.messageStatStore = messageStatStore;
+        this.penaltyStore = penaltyStore;
+        this.userProfileStore = userProfileStore;
     }
 
     @Override
@@ -30,8 +36,11 @@ public class StatisticsCommand implements BotCommand
         builder.setTimestamp(Instant.now());
         builder.setColor(new Color(36, 113, 163));
 
-        builder.addField("Messages", Long.toString(persistenceService.messagesStored()), true);
-        builder.addField("Opted-in Users", Integer.toString(persistenceService.getOptedInUsers().size()), true);
+        builder.addField("Messages", Long.toString(messageStatStore.size()), true);
+        builder.addField("Penalties", Long.toString(penaltyStore.size()), true);
+        builder.addField("User Profiles", Long.toString(userProfileStore.size()), true);
+
+        // builder.addField("Opted-in Users", Integer.toString(persistenceService.getOptedInUsers().size()), true);
 
         channel.sendMessage(builder.build()).complete();
     }

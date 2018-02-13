@@ -2,9 +2,8 @@ package com.factorsofx.stattrack.command;
 
 import com.factorsofx.stattrack.MessageUtils;
 import com.factorsofx.stattrack.penalty.Penalty;
-import com.factorsofx.stattrack.persist.PersistenceService;
+import com.factorsofx.stattrack.persist.PenaltyStore;
 import com.factorsofx.stattrack.security.Permission;
-import com.joestelmach.natty.Parser;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -20,7 +19,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 @RegisterCommand(value = "penalize", permissions = Permission.PENALIZE, optExclusive = false)
-public class Penalize implements BotCommand
+public class PenalizeCommand implements BotCommand
 {
     private static Options options = new Options();
     static
@@ -29,11 +28,11 @@ public class Penalize implements BotCommand
         options.addOption("r", "reason", true, "Reason for penalty");
     }
 
-    private PersistenceService persistenceService;
+    private PenaltyStore penaltyStore;
 
-    public Penalize(PersistenceService persistenceService)
+    public PenalizeCommand(PenaltyStore penaltyStore)
     {
-        this.persistenceService = persistenceService;
+        this.penaltyStore = penaltyStore;
     }
 
     @Override
@@ -90,7 +89,7 @@ public class Penalize implements BotCommand
 
             MessageUtils.doIfConfirmed("Are you sure you wish to issue a penalty?", channel, user, () ->
             {
-                persistenceService.persistPenalty(penalty);
+                penaltyStore.store(penalty);
                 channel.sendMessage(new EmbedBuilder()
                         .setTitle("Penalty Issued")
                         .addField("Reason", penalty.getReason(), false)

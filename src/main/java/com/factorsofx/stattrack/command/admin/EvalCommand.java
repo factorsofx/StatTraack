@@ -3,7 +3,6 @@ package com.factorsofx.stattrack.command.admin;
 import com.factorsofx.stattrack.MessageUtils;
 import com.factorsofx.stattrack.command.BotCommand;
 import com.factorsofx.stattrack.command.RegisterCommand;
-import com.factorsofx.stattrack.persist.PersistenceService;
 import com.factorsofx.stattrack.security.Permission;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
@@ -24,14 +23,10 @@ public class EvalCommand implements BotCommand
 {
     private NashornScriptEngine engine = (NashornScriptEngine) new NashornScriptEngineFactory().getScriptEngine("--language=es6");
 
-    private PersistenceService persistenceService;
-
     private StringBuilderWriter writer = new StringBuilderWriter();
 
-    public EvalCommand(PersistenceService persistenceService)
+    public EvalCommand()
     {
-        this.persistenceService = persistenceService;
-
         engine.getContext().setWriter(writer);
 
         NullInputStream input = new NullInputStream(0);
@@ -46,8 +41,6 @@ public class EvalCommand implements BotCommand
         engine.put("__user", user);
         engine.put("__channel", channel);
         engine.put("__msg", message);
-
-        engine.put("__ps", persistenceService);
 
         String joined = StringUtils.join(args, " ");
         try

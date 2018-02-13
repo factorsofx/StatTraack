@@ -2,7 +2,7 @@ package com.factorsofx.stattrack;
 
 import com.factorsofx.stattrack.command.*;
 import com.factorsofx.stattrack.command.admin.StatisticsCommand;
-import com.factorsofx.stattrack.persist.PersistenceService;
+import com.factorsofx.stattrack.persist.UserProfileStore;
 import com.factorsofx.stattrack.security.Permission;
 import com.factorsofx.stattrack.security.UserProfile;
 import com.google.common.collect.ClassToInstanceMap;
@@ -26,26 +26,24 @@ import java.util.Set;
 
 public class CommandListener
 {
-    private PersistenceService persistenceService;
     private String cmdPrefix;
+
+    private UserProfileStore userProfileStore;
 
     private Map<String, Tuple2<BotCommand, RegisterCommand>> commandMap;
 
     private static final Logger log = LoggerFactory.getLogger(CommandListener.class);
 
-    public CommandListener(PersistenceService persistenceService, String cmdPrefix)
+    public CommandListener(ClassToInstanceMap<Object> dependencies, String cmdPrefix)
     {
-        this.persistenceService = persistenceService;
+        this.userProfileStore = dependencies.getInstance(UserProfileStore.class);
+
         this.cmdPrefix = cmdPrefix;
 
         commandMap = new HashMap<>();
 
         Reflections reflections = new Reflections("com.factorsofx.stattrack.command");
         Set<Class<?>> commandClasses = reflections.getTypesAnnotatedWith(RegisterCommand.class);
-
-        ClassToInstanceMap<Object> dependencies = ImmutableClassToInstanceMap.builder()
-                .put(PersistenceService.class, persistenceService)
-                .build();
 
         for(Class<?> annotatedClass : commandClasses)
         {
@@ -94,7 +92,7 @@ public class CommandListener
 
             if(cmd != null)
             {
-                UserProfile profile = persistenceService.getUserProfile(event.getAuthor(), event.getGuild());
+                UserProfile profile = userProfileStore.getGuildProfileForUser(event.getGuild().getIdLong(), event.getAuthor().getIdLong());
 
                 if(profile.getPerms().contains(Permission.BANNED))
                 {

@@ -1,4 +1,4 @@
-package com.factorsofx.stattrack.persist;
+package com.factorsofx.stattrack.persist.mongo.provider;
 
 import org.bson.BsonReader;
 import org.bson.BsonWriter;

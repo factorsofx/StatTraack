@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.List;
 
 @RegisterCommand(value = "quote", optExclusive = false)
-public class Quote implements BotCommand
+public class QuoteCommand implements BotCommand
 {
     @Override
     public void execute(User user, TextChannel channel, Message message, String[] args)
